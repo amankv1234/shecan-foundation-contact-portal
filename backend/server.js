@@ -36,12 +36,19 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Start server
-const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-};
+// Start server if not running in Vercel (or Serverless)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const startServer = async () => {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  };
+  startServer();
+} else {
+  // In Vercel, just connect DB, don't start a listener
+  connectDB();
+}
 
-startServer();
+// Export for Vercel Serverless Function
+module.exports = app;
