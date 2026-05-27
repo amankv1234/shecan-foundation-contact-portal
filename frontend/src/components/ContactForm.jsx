@@ -66,7 +66,13 @@ const ContactForm = () => {
         setStatus((prev) => ({ ...prev, success: false }));
       }, 5000);
     } catch (error) {
-      const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Something went wrong. Please try again later.';
+      let errorMsg = error.response?.data?.error || error.response?.data?.message || 'Something went wrong. Please try again later.';
+      
+      // If the server returns an error object (like Vercel's default 500 error: { code, message })
+      if (typeof errorMsg === 'object' && errorMsg !== null) {
+        errorMsg = errorMsg.message || JSON.stringify(errorMsg);
+      }
+
       setStatus({ 
         loading: false, 
         success: false, 
